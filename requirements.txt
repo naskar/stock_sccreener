@@ -1,0 +1,7 @@
+requests
+pandas
+pandas
+numpy
+yfinance
+jinja2
+xlsxwriter
