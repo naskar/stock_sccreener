@@ -22,7 +22,7 @@ def color_text(val):
 
 def last_year_return(stock_data):
     diff_percentage = (((stock_data["mother_live_price"] - stock_data["mother_1year_close"]) * 100) / stock_data["mother_1year_close"])
-    stock_data["mother_one_year_return"] = diff_percentage
+    stock_data["mother_one_year_return"] = round(diff_percentage, 2)
 
 
 def deduce_mother(prev_high, prev_low, today_high, today_low, prev_open, prev_close):
@@ -69,22 +69,23 @@ def get_today_price(stock_data):
         # Calculate RSI
         # Fetch data for the previous 2 days (yesterday and today)
         historical_info = stock.history(period="1y")
+        historical_info.drop(index=historical_info.index[-1], axis=0, inplace=True)
         latest_rsi = calculate_rsi(historical_info).iloc[-1]   
-        stock_data["mother_live_price"] = float(current_price)
-        stock_data["mother_today_open_price"] = float(open_price)
-        stock_data["mother_today_high"] = float(high_price)
-        stock_data["mother_today_low"] = float(low_price)
-        stock_data["mother_RSI"] = float(latest_rsi)
-        stock_data["mother_previous_close"] = float(historical_info['Close'].iloc[-2])
-        stock_data["mother_previous_high"] = float(historical_info['High'].iloc[-2])
-        stock_data["mother_previous_low"] = float(historical_info['Low'].iloc[-2])
-        stock_data["mother_1year_close"] = float(historical_info['Close'].iloc[0])
-        stock_data["mother_previous_open"] = float(historical_info['Open'].iloc[-2])
+        stock_data["mother_live_price"] =round(float(current_price), 2)
+        stock_data["mother_today_open_price"] = round(float(open_price), 2)
+        stock_data["mother_today_high"] = round(float(high_price), 2)
+        stock_data["mother_today_low"] =round (float(low_price), 2)
+        stock_data["mother_RSI"] = round(float(latest_rsi), 2)
+        stock_data["mother_previous_close"] =round(float(historical_info['Close'].iloc[-2]), 2)
+        stock_data["mother_previous_high"] = round(float(historical_info['High'].iloc[-2]), 2)
+        stock_data["mother_previous_low"] = round(float(historical_info['Low'].iloc[-2]), 2)
+        stock_data["mother_1year_close"] = round(float(historical_info['Close'].iloc[0]), 2)
+        stock_data["mother_previous_open"] = round(float(historical_info['Open'].iloc[-2]), 2)
         last_year_return(stock_data=stock_data)
-        print(f"stock data ccompleted for - {stock_data['Symbol']}")
+        print(f"stock data processing completed for - {stock_data['Symbol']}")
 
     else:
-        print(f"stock data ccompleted for - {stock_data['Symbol']}")
+        print(f"stock data proessing completed for - {stock_data['Symbol']}")
         stock_data = {}
         
 
@@ -92,7 +93,6 @@ def get_today_price(stock_data):
 # Example usage
 if __name__ == "__main__":
     stock_list = pd.read_csv("stock_list/nifty_100.csv").to_dict(orient="records")
-    stock_list = stock_list[:10]
     try:
         for item in stock_list:
             stock_data = get_today_price(stock_data = item)
@@ -107,7 +107,7 @@ if __name__ == "__main__":
         .map(color_text, subset=['mother_live_price'])
         .map(color_text_one_year, subset=['mother_one_year_return'])
     )
-    stock_list_df.to_excel('mother_baby_stock.xlsx', engine='xlsxwriter', index=False)
+    stock_list_df.to_excel('stock_list/mother_baby_stock.xlsx', engine='xlsxwriter', index=False)
     print("Exported mother_baby_stock Excel")
     # html = stock_list_df.to_html()
 
