@@ -82,11 +82,11 @@ def get_today_price(stock_data):
         stock_data["mother_today_high"] = round(float(high_price), 2)
         stock_data["mother_today_low"] =round (float(low_price), 2)
         stock_data["mother_RSI"] = round(float(latest_rsi), 2)
-        stock_data["mother_previous_close"] =round(float(historical_info['Close'].iloc[-2]), 2)
-        stock_data["mother_previous_high"] = round(float(historical_info['High'].iloc[-2]), 2)
-        stock_data["mother_previous_low"] = round(float(historical_info['Low'].iloc[-2]), 2)
+        stock_data["mother_previous_close"] =round(float(historical_info['Close'].iloc[-1]), 2)
+        stock_data["mother_previous_high"] = round(float(historical_info['High'].iloc[-1]), 2)
+        stock_data["mother_previous_low"] = round(float(historical_info['Low'].iloc[-1]), 2)
         stock_data["mother_1year_close"] = round(float(historical_info['Close'].iloc[0]), 2)
-        stock_data["mother_previous_open"] = round(float(historical_info['Open'].iloc[-2]), 2)
+        stock_data["mother_previous_open"] = round(float(historical_info['Open'].iloc[-1]), 2)
         last_year_return(stock_data=stock_data)
         print(f"stock data processing completed for - {stock_data['Symbol']}")
 
@@ -98,7 +98,7 @@ def get_today_price(stock_data):
 #
 # Example usage
 if __name__ == "__main__":
-    stock_list = pd.read_csv("stock_list/nifty_100.csv").to_dict(orient="records")
+    stock_list = pd.read_csv("stock_list/stock_list.csv").to_dict(orient="records")
     try:
         for item in stock_list:
             stock_data = get_today_price(stock_data = item)

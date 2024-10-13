@@ -6,7 +6,7 @@ def convert_xlsx_to_csv(xlsx_file):
     # Read the Excel file
     df = pd.read_excel(xlsx_file)  # Reads all sheets
     df.dropna(inplace=True)
-    df = df[["Company Name", "Industry", "mother_live_price", "mother_one_year_return"]]
+    df = df[["Company Name", "Industry", "Symbol", "mother_live_price", "mother_one_year_return"]]
     df.rename(columns={'mother_live_price': 'price', 'mother_one_year_return': 'one_yr_return'}, inplace=True)
     df = (
         df.style
