@@ -5,6 +5,12 @@ import yfinance as yf
 import time
 import numpy as np
 
+def color_text_price(val):
+    if val >= 100:
+        return 'color: green;'  # Change color to green for values > 100
+    else:
+        return 'color: blue;' 
+    
 
 def color_text_one_year(val):
     if val >= 20:
