@@ -4,6 +4,18 @@ import yfinance as yf
 from mother_baby_filter import calculate_rsi
 import time
 
+def color_text_rsi_comp(val):
+    if val >= 75:
+        return 'color: pink;'  # Change color to green for values > 100
+    else:
+        return 'color: green;' 
+
+def color_text_comp(vals):
+    return ['color: green' if val > s else 'color: pink' for val, s in zip(vals, stock_list_df['mother_previous_high'])]
+
+def color_text_comp_low(vals):
+    return ['color: blue' if val > s else 'color: pink' for val, s in zip(vals, stock_list_df['mother_previous_low'])]
+
 def color_text_RR(val):
     if val == "RR - True":
         return 'color: green;'  # Change color to green for values > 100
@@ -48,9 +60,10 @@ def get_screener_condition_col(stock_data):
     screener_stock_details["Industry"]  = stock_data["Industry"]
     screener_stock_details["Symbol"]  = stock_data["Symbol"]
     screener_stock_details["mother_previous_high"]  = stock_data["mother_previous_high"]
+    screener_stock_details["mother_previous_low"]  = stock_data["mother_previous_low"]
 
     stock_info = stock.history(period="1d", interval="1m")  # 1-minute interval for near real-time
-    screener_stock_details["Price"] = round((float(stock_info['Close'].iloc[-1])), 2)
+    screener_stock_details["Price"] = round((float(stock_info['Close'].iloc[-1])), 3)
     comp_data = (stock_data["mother_previous_high"] * 5) / 100
     if stock_data["mother_previous_high"] - stock_data["mother_previous_low"] >= comp_data:
         screener_stock_details["high or low"] = 'High'
@@ -83,14 +96,14 @@ def get_screener_condition_col(stock_data):
 
 
 if __name__ == "__main__":
-    stock_list = []
-    stock_list_1 =pd.read_excel("stock_list/mother_baby_stock.xlsx").to_dict(orient="records")
-    stock_list_2 = pd.read_excel("stock_list/sheet2.xlsx").to_dict("records")
-    for i in range(len(stock_list_2)):
-        for j in range(len(stock_list_1)):
-            if stock_list_2[i]["Symbol"] == stock_list_1[j]["Symbol"]:
-                stock_list.append(stock_list_1[j])
     while True:
+        stock_list = []
+        stock_list_1 =pd.read_excel("stock_list/mother_baby_stock.xlsx").to_dict(orient="records")
+        stock_list_2 = pd.read_excel("stock_list/sheet2.xlsx").to_dict("records")
+        for i in range(len(stock_list_2)):
+            for j in range(len(stock_list_1)):
+                if stock_list_2[i]["Symbol"] == stock_list_1[j]["Symbol"]:
+                    stock_list.append(stock_list_1[j])
         stock_data_list = []
         try:
             for item in stock_list:
@@ -102,17 +115,22 @@ if __name__ == "__main__":
         stock_list_df = pd.DataFrame(stock_data_list)
         stock_list_df_styler = (
             stock_list_df.style
-            .map(color_text_rsi, subset=['RSI'])
             .map(color_text_value, subset=['high or low'])
             .map(color_text_rsi, subset=['RSI Cross over'])
             .map(color_text_rsi_cross, subset=['Price Crossover'])
             .map(color_text_RR, subset=['RR Ratio'])
+            .map(color_text_rsi_comp, subset=['RSI'])
+            .apply(color_text_comp, subset=['Price'])
+            .apply(color_text_comp_low, subset=['Price'])
+
         )
+        stock_list_df_styler = stock_list_df_styler.hide(axis='columns', subset=['mother_previous_high', 'mother_previous_low'])
         html = stock_list_df_styler.to_html()
 
         # write html to file
         text_file = open("index.html", "w")
         text_file.write(html)
         text_file.close()
+        stock_list_df_styler.to_excel('stock_list/sheet2.xlsx', engine='xlsxwriter', index=False)
         print("Process Completed .... Price will be updated after 1 minute")
         time.sleep(60)
