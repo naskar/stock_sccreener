@@ -5,3 +5,4 @@ numpy
 yfinance
 jinja2
 xlsxwriter
+openpyxl
